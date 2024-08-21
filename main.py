@@ -6,29 +6,22 @@ customtkinter.set_appearance_mode("system")
 #blue, green, and dark-blue
 customtkinter.set_default_color_theme("dark-blue")
 
-#login system
+#add list
 root = customtkinter.CTk()
-root.geometry("500x350")
 
-def login():
-        print("test")
+label = customtkinter.CTkLabel(master=root, text="Checklist", font=("Roboto", 24))
+label.pack(pady=12, padx=100)
 
-frame  =customtkinter.CTkFrame(master=root)
-frame.pack(pady=20, padx=60, fill="both", expand=True)
+def new_entry(entry):
+    checkbox = customtkinter.CTkCheckBox(master=root, text=entry.get())
+    checkbox.pack(pady=12, padx=10)
 
-label = customtkinter.CTkLabel(master=frame, text="Login System", font=("Roboto", 24))
-label.pack(pady=12, padx=10)
+user_input = customtkinter.StringVar(root)
 
-entry1 = customtkinter.CTkEntry(master=frame, placeholder_text="Username")
-entry1.pack(pady=12, padx=10)
+entry = customtkinter.CTkEntry(master=root, placeholder_text="New Task", textvariable=user_input)
+entry.pack(pady=12, padx=10)
 
-entry2 = customtkinter.CTkEntry(master=frame, placeholder_text="Password", show="*")
-entry2.pack(pady=12, padx=10)
-
-button = customtkinter.CTkButton(master=frame, text="Login", command=login)
+button = customtkinter.CTkButton(master=root, text="Add New Task", command=lambda : new_entry(entry))
 button.pack(pady=12, padx=10)
-
-checkbox = customtkinter.CTkCheckBox(master=frame, text="Remember Me")
-checkbox.pack(pady=12, padx=10)
 
 root.mainloop()
