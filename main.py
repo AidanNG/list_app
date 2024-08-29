@@ -2,9 +2,14 @@ import customtkinter
 import csv
 import pandas as pd
 
+global checkboxes
+checkboxes = []
 #open csvs into a pandas data frame
 active_df = pd.read_csv('Active_Tasks.csv')
 closed_df = pd.read_csv('Closed_Tasks.csv')
+
+if 'checked' not in active_df.columns:
+    active_df['checked'] = False
 
 #frame
 #system, dark, or light
@@ -19,45 +24,52 @@ label = customtkinter.CTkLabel(master=root, text="Checklist", font=("Roboto", 24
 label.pack(pady=12, padx=100)
 
 def initialize_checkboxes():
-    global checkboxes
-    checkboxes = []
-    for index, row in active_df.iterrows():
+    global checkboxes, active_df
+    for _, row in active_df.iterrows():
         task_text = row['task']
+        is_checked = row['checked']
         checkbox = customtkinter.CTkCheckBox(master=task_frame, text=task_text)
         checkbox.pack(pady=5, padx=10)
+        checkbox.select() if is_checked else checkbox.deselect()
         checkboxes.append(checkbox)
 
 def new_entry(entry):
     global active_df
+    task_text = entry.get()
     checkbox = customtkinter.CTkCheckBox(master=task_frame, text=entry.get())
     checkbox.pack(pady=5, padx=10)
     checkboxes.append(checkbox)
 
-    new_index = active_df.index.max() + 1 if not active_df.empty else 0
-    active_df.loc[new_index, 'task'] = checkbox.cget("text")
+    new_row = pd.DataFrame({'task': [task_text], 'checked': [False]})
+    active_df = pd.concat([active_df, new_row], ignore_index=True)
 
     active_df.to_csv("Active_Tasks.csv", index=False)
 
     # Clear the entry field after adding the task
     entry.delete(0, 'end')
 
+def save_checkbox_states():
+    global active_df
+    for i, checkbox in enumerate(checkboxes):
+        active_df.loc[i, 'checked'] = bool(checkbox.get())
+    active_df.to_csv("Active_Tasks.csv", index=False)
+
 def delete_entry():
-    global active_df, closed_df
+    global active_df, closed_df, checkboxes
     for check in checkboxes[:]:
         if check.get() == 1:
             task_text = check.cget("text")
             check.pack_forget()
             checkboxes.remove(check)
             
-            # Remove from active_df and add to closed_df
+            # Move task from active_df to closed_df
+            task_row = active_df[active_df['task'] == task_text]
+            closed_df = pd.concat([closed_df, task_row], ignore_index=True)
             active_df = active_df[active_df['task'] != task_text]
-            new_index = closed_df.index.max() + 1 if not closed_df.empty else 0
-            closed_df.loc[new_index, 'task'] = task_text
     
     # Save updated DataFrames
     active_df.to_csv("Active_Tasks.csv", index=False)
     closed_df.to_csv("Closed_Tasks.csv", index=False)
-
 
 user_input = customtkinter.StringVar(root)
 
@@ -73,6 +85,8 @@ button.pack(pady=5, padx=10)
 task_frame = customtkinter.CTkFrame(master=root)
 task_frame.pack(pady=12, padx=100)
 initialize_checkboxes()
+
+root.protocol("WM_DELETE_WINDOW", lambda: [save_checkbox_states(), root.destroy()])
 
 closed_df.to_csv("Closed_Tasks.csv", index=False)
 active_df.to_csv("Active_Tasks.csv", index=False)
