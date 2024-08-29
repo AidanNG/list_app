@@ -1,4 +1,10 @@
 import customtkinter
+import csv
+import pandas as pd
+
+#open csvs into a pandas data frame
+active_df = pd.read_csv('Active_Tasks.csv')
+closed_df = pd.read_csv('Closed_Tasks.csv')
 
 #frame
 #system, dark, or light
@@ -22,6 +28,7 @@ def delete_entry():
     for check in checkboxes:
         if check.get() == 1:
             check.pack_forget()
+
 
 user_input = customtkinter.StringVar(root)
 
