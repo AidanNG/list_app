@@ -15,10 +15,10 @@ label.pack(pady=12, padx=100)
 checkboxes = []
 def new_entry(entry):
     checkbox = customtkinter.CTkCheckBox(master=root, text=entry.get())
-    checkbox.pack(pady=12, padx=10)
+    checkbox.pack(pady=5, padx=10)
     checkboxes.append(checkbox)
 
-def delete_finished_tasks():
+def delete_entry():
     for check in checkboxes:
         if check.get() == 1:
             check.pack_forget()
@@ -29,9 +29,9 @@ entry = customtkinter.CTkEntry(master=root, placeholder_text="New Task", textvar
 entry.pack(pady=12, padx=10)
 
 button = customtkinter.CTkButton(master=root, text="Add New Task", command=lambda : new_entry(entry))
-button.pack(pady=12, padx=10)
+button.pack(pady=5, padx=10)
 
-button = customtkinter.CTkButton(master=root, text="Remove Done Tasks", command=lambda : delete_finished_tasks())
-button.pack(pady=12, padx=10)
+button = customtkinter.CTkButton(master=root, text="Remove Done Tasks", command=lambda : delete_entry())
+button.pack(pady=5, padx=10)
 
 root.mainloop()
