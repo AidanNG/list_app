@@ -8,10 +8,11 @@ checkboxes = []
 active_df = pd.read_csv('Active_Tasks.csv')
 closed_df = pd.read_csv('Closed_Tasks.csv')
 
+#autopopulate the checked column
 if 'checked' not in active_df.columns:
     active_df['checked'] = False
 
-#frame
+#frame - defaults
 #system, dark, or light
 customtkinter.set_appearance_mode("system")
 #blue, green, and dark-blue
@@ -23,6 +24,7 @@ root = customtkinter.CTk()
 label = customtkinter.CTkLabel(master=root, text="Checklist", font=("Roboto", 24))
 label.pack(pady=12, padx=100)
 
+#functions
 def initialize_checkboxes():
     global checkboxes, active_df
     for _, row in active_df.iterrows():
@@ -71,6 +73,8 @@ def delete_entry():
     active_df.to_csv("Active_Tasks.csv", index=False)
     closed_df.to_csv("Closed_Tasks.csv", index=False)
 
+
+#main script
 user_input = customtkinter.StringVar(root)
 
 entry = customtkinter.CTkEntry(master=root, placeholder_text="New Task", textvariable=user_input)
