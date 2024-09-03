@@ -119,7 +119,7 @@ def update_dataframes():
 task_input = customtkinter.CTkEntry(master=main_frame, placeholder_text="New Task")
 task_input.pack(pady=5, padx=10)
 
-due_date_input = customtkinter.CTkEntry(master=main_frame, placeholder_text="Due Date (YYYY-MM-DD)")
+due_date_input = customtkinter.CTkEntry(master=main_frame, placeholder_text="Due Date")
 due_date_input.pack(pady=5, padx=10)
 
 tag_input = customtkinter.CTkEntry(master=main_frame, placeholder_text="Tag")
@@ -149,7 +149,7 @@ def update_tag_frames():
             tag_frame = customtkinter.CTkFrame(master=root)
             tag_frame.pack(side="right", padx=20, pady=20, fill="both", expand=True)
             
-            tag_label = customtkinter.CTkLabel(master=tag_frame, text=f"Tag: {tag}", font=("Roboto", 18))
+            tag_label = customtkinter.CTkLabel(master=tag_frame, text=f"{tag}", font=("Roboto", 18))
             tag_label.pack(pady=5, padx=10)
             
             tag_tasks = active_df[active_df['tag'] == tag]
