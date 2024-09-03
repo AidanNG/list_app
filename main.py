@@ -1,5 +1,4 @@
 import customtkinter
-import csv
 import pandas as pd
 
 global checkboxes
