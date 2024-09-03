@@ -1,96 +1,133 @@
 import customtkinter
 import pandas as pd
+from datetime import datetime
+from entry import Entry
 
-global checkboxes
-checkboxes = []
-#open csvs into a pandas data frame
+# Read CSV files
 active_df = pd.read_csv('Active_Tasks.csv')
 closed_df = pd.read_csv('Closed_Tasks.csv')
 
-#autopopulate the checked column
-if 'checked' not in active_df.columns:
-    active_df['checked'] = False
+# Clean up DataFrames
+active_df = active_df.loc[:, ~active_df.columns.str.contains('^Unnamed')]
+closed_df = closed_df.loc[:, ~closed_df.columns.str.contains('^Unnamed')]
 
-#frame - defaults
-#system, dark, or light
+# Ensure all necessary columns exist
+columns = ['task', 'completion_status', 'date_created', 'due_date', 'tag']
+for df in [active_df, closed_df]:
+    for col in columns:
+        if col not in df.columns:
+            df[col] = ''
+    df['completion_status'] = df['completion_status'].astype(bool)
+    df['date_created'] = pd.to_datetime(df['date_created'], errors='coerce')
+    df['due_date'] = pd.to_datetime(df['due_date'], errors='coerce')
+
+# Save cleaned DataFrames
+active_df.to_csv("Active_Tasks.csv", index=False)
+closed_df.to_csv("Closed_Tasks.csv", index=False)
+
+# GUI setup
 customtkinter.set_appearance_mode("system")
-#blue, green, and dark-blue
 customtkinter.set_default_color_theme("dark-blue")
 
-#add list
 root = customtkinter.CTk()
+root.title("Task Manager")
 
-label = customtkinter.CTkLabel(master=root, text="Checklist", font=("Roboto", 24))
+label = customtkinter.CTkLabel(master=root, text="Task Manager", font=("Roboto", 24))
 label.pack(pady=12, padx=100)
 
-#functions
-def initialize_checkboxes():
-    global checkboxes, active_df
-    for _, row in active_df.iterrows():
-        task_text = row['task']
-        is_checked = row['checked']
-        checkbox = customtkinter.CTkCheckBox(master=task_frame, text=task_text)
-        checkbox.pack(pady=5, padx=10)
-        checkbox.select() if is_checked else checkbox.deselect()
-        checkboxes.append(checkbox)
+entries = []
+checkboxes = []
 
-def new_entry(entry):
-    global active_df
-    task_text = entry.get()
-    checkbox = customtkinter.CTkCheckBox(master=task_frame, text=entry.get())
-    checkbox.pack(pady=5, padx=10)
-    checkboxes.append(checkbox)
-
-    new_row = pd.DataFrame({'task': [task_text], 'checked': [False]})
-    active_df = pd.concat([active_df, new_row], ignore_index=True)
-
-    active_df.to_csv("Active_Tasks.csv", index=False)
-
-    # Clear the entry field after adding the task
-    entry.delete(0, 'end')
-
-def save_checkbox_states():
-    global active_df
-    for i, checkbox in enumerate(checkboxes):
-        active_df.loc[i, 'checked'] = bool(checkbox.get())
-    active_df.to_csv("Active_Tasks.csv", index=False)
-
-def delete_entry():
-    global active_df, closed_df, checkboxes
-    for check in checkboxes[:]:
-        if check.get() == 1:
-            task_text = check.cget("text")
-            check.pack_forget()
-            checkboxes.remove(check)
-            
-            # Move task from active_df to closed_df
-            task_row = active_df[active_df['task'] == task_text]
-            closed_df = pd.concat([closed_df, task_row], ignore_index=True)
-            active_df = active_df[active_df['task'] != task_text]
+def new_entry(entry_widget, due_date_widget, tag_widget):
+    task = entry_widget.get()
+    due_date_str = due_date_widget.get()
+    tag = tag_widget.get()
     
-    # Save updated DataFrames
+    if task:
+        due_date = pd.to_datetime(due_date_str, errors='coerce') if due_date_str else pd.NaT
+        new_entry = Entry(task, due_date=due_date, tag=tag)
+        entries.append(new_entry)
+        
+        checkbox = customtkinter.CTkCheckBox(master=root, text=str(new_entry))
+        checkbox.configure(command=lambda e=new_entry, c=checkbox: toggle_completion(e, c))
+        checkbox.pack(pady=5, padx=10)
+        checkboxes.append(checkbox)
+        
+        # Clear input fields
+        entry_widget.delete(0, 'end')
+        due_date_widget.delete(0, 'end')
+        tag_widget.delete(0, 'end')
+        
+        # Update active_df
+        active_df.loc[len(active_df)] = [new_entry.task, new_entry.completion_status, new_entry.date_created, new_entry.due_date, new_entry.tag]
+        active_df.to_csv("Active_Tasks.csv", index=False)
+
+def toggle_completion(entry, checkbox):
+    if entry.completion_status:
+        entry.uncomplete()
+    else:
+        entry.complete()
+    checkbox.configure(text=str(entry))
+    update_dataframes()
+
+def delete_completed():
+    global entries, checkboxes
+    entries_to_remove = []
+    checkboxes_to_remove = []
+    
+    for entry, checkbox in zip(entries, checkboxes):
+        if entry.completion_status:
+            entries_to_remove.append(entry)
+            checkboxes_to_remove.append(checkbox)
+            checkbox.pack_forget()
+            
+            # Move to closed_df
+            closed_df.loc[len(closed_df)] = [entry.task, entry.completion_status, entry.date_created, entry.due_date, entry.tag]
+    
+    for entry in entries_to_remove:
+        entries.remove(entry)
+    for checkbox in checkboxes_to_remove:
+        checkboxes.remove(checkbox)
+    
+    update_dataframes()
+
+def update_dataframes():
+    global active_df, closed_df
+    active_df = pd.DataFrame([vars(entry) for entry in entries])
     active_df.to_csv("Active_Tasks.csv", index=False)
     closed_df.to_csv("Closed_Tasks.csv", index=False)
 
+# Input fields
+task_input = customtkinter.CTkEntry(master=root, placeholder_text="New Task")
+task_input.pack(pady=5, padx=10)
 
-#main script
-user_input = customtkinter.StringVar(root)
+due_date_input = customtkinter.CTkEntry(master=root, placeholder_text="Due Date (YYYY-MM-DD)")
+due_date_input.pack(pady=5, padx=10)
 
-entry = customtkinter.CTkEntry(master=root, placeholder_text="New Task", textvariable=user_input)
-entry.pack(pady=12, padx=10)
+tag_input = customtkinter.CTkEntry(master=root, placeholder_text="Tag")
+tag_input.pack(pady=5, padx=10)
 
-button = customtkinter.CTkButton(master=root, text="Add New Task", command=lambda : new_entry(entry))
-button.pack(pady=5, padx=10)
+add_button = customtkinter.CTkButton(master=root, text="Add New Task", command=lambda: new_entry(task_input, due_date_input, tag_input))
+add_button.pack(pady=5, padx=10)
 
-button = customtkinter.CTkButton(master=root, text="Remove Done Tasks", command=lambda : delete_entry())
-button.pack(pady=5, padx=10)
+delete_button = customtkinter.CTkButton(master=root, text="Remove Completed Tasks", command=delete_completed)
+delete_button.pack(pady=5, padx=10)
 
-task_frame = customtkinter.CTkFrame(master=root)
-task_frame.pack(pady=12, padx=100)
-initialize_checkboxes()
+# Initialize existing tasks
+for _, row in active_df.iterrows():
+    entry = Entry(
+        row['task'],
+        row['completion_status'],
+        row['date_created'] if pd.notna(row['date_created']) else None,
+        row['due_date'] if pd.notna(row['due_date']) else None,
+        row['tag']
+    )
+    entries.append(entry)
+    checkbox = customtkinter.CTkCheckBox(master=root, text=str(entry))
+    checkbox.configure(command=lambda e=entry, c=checkbox: toggle_completion(e, c))
+    checkbox.pack(pady=5, padx=10)
+    checkboxes.append(checkbox)
+    if entry.completion_status:
+        checkbox.select()
 
-root.protocol("WM_DELETE_WINDOW", lambda: [save_checkbox_states(), root.destroy()])
-
-closed_df.to_csv("Closed_Tasks.csv", index=False)
-active_df.to_csv("Active_Tasks.csv", index=False)
 root.mainloop()

@@ -1,7 +1,8 @@
 #A file to deal with the definition and handling of the entry class to improve entries.
-import datetime
+from datetime import datetime 
+import pandas as pd
 
-class entry:
+class Entry:
     def __init__(self, task, completion_status=False, date_created=None, due_date=None, tag=None):
         self.task = task
         self.completion_status = completion_status
@@ -23,6 +24,7 @@ class entry:
 
     def __str__(self):
         status = "Completed" if self.completion_status else "Not Completed"
-        due_date = f", Due: {self.due_date.strftime('%Y-%m-%d')}" if self.due_date else ""
+        created = f"Created: {self.date_created.strftime('%Y-%m-%d')}" if pd.notna(self.date_created) else "Created: N/A"
+        due_date = f", Due: {self.due_date.strftime('%Y-%m-%d')}" if pd.notna(self.due_date) else ""
         tag = f", Tag: {self.tag}" if self.tag else ""
-        return f"{self.task} ({status}, Created: {self.date_created.strftime('%Y-%m-%d')}{due_date}{tag})"   
+        return f"{self.task} ({status}, {created}{due_date}{tag})"  
