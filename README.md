@@ -11,3 +11,5 @@ python init.py
 and then from there, to use the app,
 
 python main.py
+
+test test
