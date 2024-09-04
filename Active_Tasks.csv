@@ -2,3 +2,4 @@ task,completion_status,date_created,due_date,tag
 go for a run,False,2024-09-02 22:06:52.423883,,exercise
 study for exam,False,2024-09-02 22:16:22.287018,,school
 eat 3 meals today,False,2024-09-02 23:09:09.462145,,health
+go gym,False,2024-09-04 11:55:48.405165,,exercise
