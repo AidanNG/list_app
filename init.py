@@ -11,11 +11,11 @@ os.remove('Closed_Tasks.csv')
 #insert fresh csvs
 with open('Active_Tasks.csv', 'w', newline='') as file:
     writer = csv.writer(file)
-    field = ['task','checked','completion_status','date_created','due_date','tag']
+    field = ['task','completion_status','date_created','due_date','tag']
     writer.writerow(field)
 
 with open('Closed_Tasks.csv', 'w', newline='') as file:
     writer = csv.writer(file)
-    field = ['task','checked','completion_status','date_created','due_date','tag']
+    field = ['task','completion_status','date_created','due_date','tag']
     writer.writerow(field)
 
