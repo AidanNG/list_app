@@ -2,6 +2,7 @@
 from datetime import datetime 
 import pandas as pd
 
+#Entry Class definition
 class Entry:
     def __init__(self, task, completion_status=False, date_created=None, due_date=None, tag=None):
         self.task = task
@@ -10,6 +11,7 @@ class Entry:
         self.due_date = due_date  # Keep this as a string
         self.tag = tag
 
+    #simple setter/toggle functions for ease of use
     def complete(self):
         self.completion_status = True
 
@@ -22,6 +24,7 @@ class Entry:
     def set_tag(self, tag):
         self.tag = tag
 
+    #Checkbox text appearance
     def __str__(self):
         status = "Completed" if self.completion_status else "Not Completed"
         created = f"Created: {self.date_created.strftime('%Y-%m-%d')}" if pd.notna(self.date_created) else "Created: N/A"

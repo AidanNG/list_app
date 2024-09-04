@@ -1,6 +1,5 @@
 import customtkinter
 import pandas as pd
-from datetime import datetime
 from entry import Entry
 
 # Read CSV files
@@ -42,16 +41,20 @@ label.pack(pady=12, padx=100)
 entries = []
 checkboxes = []
 
+#Grabs text from the text boxes and inserts to list
 def new_entry(entry_widget, due_date_widget, tag_widget):
+    #retrieve text
     task = entry_widget.get()
     due_date_str = due_date_widget.get()
     tag = tag_widget.get()
     
+    #if the task box is populated, create Entry and add the input text
     if task:
         due_date = pd.to_datetime(due_date_str, errors='coerce') if due_date_str else pd.NaT
         new_entry = Entry(task, due_date=due_date, tag=tag)
         entries.append(new_entry)
         
+        #create check box
         checkbox = customtkinter.CTkCheckBox(master=main_frame, text=str(new_entry))
         checkbox.configure(command=lambda e=new_entry, c=checkbox: toggle_completion(e, c))
         checkbox.pack(pady=5, padx=10)
@@ -62,7 +65,7 @@ def new_entry(entry_widget, due_date_widget, tag_widget):
         due_date_widget.delete(0, 'end')
         tag_widget.delete(0, 'end')
         
-        # Update active_df
+        # Update active_df csv
         new_row = pd.DataFrame({
             'task': [new_entry.task],
             'completion_status': [new_entry.completion_status],
@@ -77,20 +80,25 @@ def new_entry(entry_widget, due_date_widget, tag_widget):
         # Update tag frames
         update_tag_frames()
 
+#function to update dataframes and tag frames based on completion status
 def toggle_completion(entry, checkbox):
     if entry.completion_status:
         entry.uncomplete()
     else:
         entry.complete()
     checkbox.configure(text=str(entry))
+
+    #update dataframes and tag_frames
     update_dataframes()
     update_tag_frames()
 
+#if a checkbox is checked, on button press, delete all checked boxes and update UI
 def delete_completed():
     global entries, checkboxes
     entries_to_remove = []
     checkboxes_to_remove = []
     
+    #collect completed entries and add to closed_df
     for entry, checkbox in zip(entries, checkboxes):
         if entry.completion_status:
             entries_to_remove.append(entry)
@@ -100,14 +108,17 @@ def delete_completed():
             # Move to closed_df
             closed_df.loc[len(closed_df)] = [entry.task, entry.completion_status, entry.date_created, entry.due_date, entry.tag]
     
+    #remove completed from UI
     for entry in entries_to_remove:
         entries.remove(entry)
     for checkbox in checkboxes_to_remove:
         checkboxes.remove(checkbox)
     
+    #update dataframes and tag_frames to reflect changes
     update_dataframes()
     update_tag_frames()
 
+#Function to update csvs and active_df to reflect actions
 def update_dataframes():
     global active_df, closed_df
     active_df = pd.DataFrame([vars(entry) for entry in entries])
@@ -133,7 +144,8 @@ delete_button.pack(pady=5, padx=10)
 
 # Tag frames
 tag_frames = {}
-
+ 
+#update tag frames to reflect current list
 def update_tag_frames():
     global tag_frames
     
