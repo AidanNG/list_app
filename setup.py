@@ -6,6 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="list_app",
     version="0.1.0",
+    packages=find_packages(where="src"),
     author="Aidan NG",
     author_email="aidanngow@gmail.com",
     description="A simple list application built with Python and customTkinter",
