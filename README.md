@@ -6,15 +6,15 @@ This project will hopefully solve that problem for me.
 
 ## Installation
 
-You can install List-App using pip:
+You can install List_App using pip:
 
-pip install list-app
+pip install list_app
 
 ## Usage
 
 After installation, you can run the app from the command line:
 
-list-app
+list_app
 
 Once everything is runnning, you can use the text boxes to start adding things to the task list.
 
