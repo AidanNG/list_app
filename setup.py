@@ -13,6 +13,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/AidanNG/list_app",
     packages=find_packages(where="src"),
+    package_dir={"": "src"},
     install_requires=[
         "customtkinter","pandas"
     ],

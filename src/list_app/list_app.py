@@ -1,6 +1,6 @@
 import customtkinter
 import pandas as pd
-from entry import Entry
+from list_app.entry import Entry
 import sys
 
 def list_app():
