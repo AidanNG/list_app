@@ -14,7 +14,7 @@ setup(
     url="https://github.com/AidanNG/list_app",
     packages=find_packages(where="src"),
     install_requires=[
-        "customtkinter","numpy"
+        "customtkinter","pandas"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -23,7 +23,7 @@ setup(
     ],
     python_requires=">=3.6",
     entry_points={
-        "gui_scripts": [
+        "console_scripts": [
             "list_app=list_app.list_app:main",
         ],
     },
