@@ -5,8 +5,8 @@ import sys
 
 def list_app():
     # Read CSV files
-    active_df = pd.read_csv('Active_Tasks.csv')
-    closed_df = pd.read_csv('Closed_Tasks.csv')
+    active_df = pd.read_csv('./tasks/Active_Tasks.csv')
+    closed_df = pd.read_csv('./tasks/Closed_Tasks.csv')
 
     # Clean up DataFrames
     active_df = active_df.loc[:, ~active_df.columns.str.contains('^Unnamed')]
