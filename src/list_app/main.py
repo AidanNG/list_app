@@ -23,8 +23,8 @@ def list_app():
         df['due_date'] = pd.to_datetime(df['due_date'], errors='coerce')
 
     # Save cleaned DataFrames
-    active_df.to_csv("Active_Tasks.csv", index=False)
-    closed_df.to_csv("Closed_Tasks.csv", index=False)
+    active_df.to_csv("./tasks/Active_Tasks.csv", index=False)
+    closed_df.to_csv("./tasks/Closed_Tasks.csv", index=False)
 
     # GUI setup
     customtkinter.set_appearance_mode("system")
@@ -42,7 +42,8 @@ def list_app():
 
     entries = []
     checkboxes = []
-
+    # Tag frames
+    tag_frames = {}
     #Grabs text from the text boxes and inserts to list
     def new_entry(entry_widget, due_date_widget, tag_widget):
         #retrieve text
@@ -75,9 +76,9 @@ def list_app():
                 'due_date': [new_entry.due_date],
                 'tag': [new_entry.tag]
             })
-            global active_df
+            #global active_df
             active_df = pd.concat([active_df, new_row], ignore_index=True)
-            active_df.to_csv("Active_Tasks.csv", index=False)
+            active_df.to_csv("./tasks/Active_Tasks.csv", index=False)
             
             # Update tag frames
             update_tag_frames()
@@ -96,7 +97,7 @@ def list_app():
 
     #if a checkbox is checked, on button press, delete all checked boxes and update UI
     def delete_completed():
-        global entries, checkboxes
+        #global entries, checkboxes
         entries_to_remove = []
         checkboxes_to_remove = []
         
@@ -122,11 +123,11 @@ def list_app():
 
     #Function to update csvs and active_df to reflect actions
     def update_dataframes():
-        global active_df, closed_df
+        #global active_df, closed_df
         active_df = pd.DataFrame([vars(entry) for entry in entries])
         active_df = active_df[columns]  # Ensure only necessary columns are present
-        active_df.to_csv("Active_Tasks.csv", index=False)
-        closed_df.to_csv("Closed_Tasks.csv", index=False)
+        active_df.to_csv("./tasks/Active_Tasks.csv", index=False)
+        closed_df.to_csv("./tasks/Closed_Tasks.csv", index=False)
 
     # Input fields
     task_input = customtkinter.CTkEntry(master=main_frame, placeholder_text="New Task")
@@ -143,13 +144,10 @@ def list_app():
 
     delete_button = customtkinter.CTkButton(master=main_frame, text="Remove Completed Tasks", command=delete_completed)
     delete_button.pack(pady=5, padx=10)
-
-    # Tag frames
-    tag_frames = {}
     
     #update tag frames to reflect current list
     def update_tag_frames():
-        global tag_frames
+        #global tag_frames
         
         # Clear existing tag frames
         for frame in tag_frames.values():
