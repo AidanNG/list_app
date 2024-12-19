@@ -1,14 +1,18 @@
 # To Do List App
-This is a basic list app. It's simple but I wanted a project that I could hopefully grow.
+This is a basic list app. 
 
 I make a lot of lists in Google docs in order to stay on track with the things I want to get done. Being what it is, it has a lot of limitations.
 This project will hopefully solve that problem for me.
 
 ## Installation
 
-You can install List_App using pip:
+In your environment, navigate to the extracted files folder, and you can install List_App using pip:
 
-pip install list_app
+python -m venv venv
+
+\venv\Scripts\activate
+
+pip install -e .
 
 ## Usage
 
@@ -16,7 +20,7 @@ After installation, you can run the app from the command line:
 
 list_app
 
-Once everything is runnning, you can use the text boxes to start adding things to the task list.
+Once everything is running, you can use the text boxes to start adding things to the task list.
 
 Inputs:
 -task name
